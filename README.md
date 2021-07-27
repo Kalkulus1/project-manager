@@ -51,6 +51,12 @@ Email: kalkulus@ktechhub.com
 Password: ktechhub
 ```
 
+### Generate an app key
+
+```bash
+php artisan key:generate
+```
+
 ### Start the server
 
 ```bash
