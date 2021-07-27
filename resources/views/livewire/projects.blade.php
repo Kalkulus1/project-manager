@@ -9,9 +9,7 @@
                 <div class="table-responsive">
                     @if ($messageText != '')
                     <div class="alert alert-{{ $alert }} alert-dismissible">
-                        <button wire:click="closeAlert" type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-
-                        <h4><i class="icon fa fa-check"></i> Success</h4>
+                        <button wire:click="closeAlert" type="button" class="btn-close btn-sm btn-{{ $alert }}" data-bs-dismiss="alert" aria-label="Close">X</button>
                         {{ $messageText }}
                     </div>
                     @endif
@@ -45,13 +43,10 @@
                                     <td>{{ $item->created_at }}</td>
                                     <td>{{ $item->updated_at }}</td>
                                     <td>
-                                        <a wire:click.prevent="view({{ $item->id }})" href="#" class="btn btn-sm btn-outline-primary">Quick View</a>
-                                        <a wire:click.prevent="edit({{ $item->id }})" href="#" class="btn btn-sm btn-outline-success">Edit</a>
-                                        <a href="" class="btn btn-sm btn-outline-danger">Delete</a>
-                                        <a href="" class="btn btn-sm btn-outline-dark">Add Tasks (5)</a>
-                                        <button wire:click.prevent="delete({{ $item->id }})"
-                                            onclick="confirm('Are you sure {{ $item->title }}?') || event.stopImmediatePropagation()"
-                                            class="btn btn-sm btn-danger">Delete</button>
+                                        <a wire:click.prevent="view({{ $item->id }})" href="#" class="btn btn-sm btn-outline-primary mb-2">Quick View</a>
+                                        <a wire:click.prevent="edit({{ $item->id }})" href="#" class="btn btn-sm btn-outline-success mb-2">Edit</a>
+                                        <a wire:click.prevent="delete({{ $item->id }})" onclick="confirm('Are you sure {{ $item->title }}?') || event.stopImmediatePropagation()" href="#" class="btn btn-sm btn-outline-danger mb-2">Delete</a>
+                                        <a href="" class="btn btn-sm btn-outline-dark mb-2">Add Tasks (5)</a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -68,18 +63,36 @@
             <div class="card">
                 <div class="card-header">{{ $project->title }} <button wire:click="close" type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button></div>
                 <div class="card-body">
-                    Status: 
-                    @if ($item->status == "Started")
+                    Status:
+                    @if ($project->status == "Started")
                     <h3 class="badge badge-dark">{{ $item->status }}</h3>
                     @endif
 
-                    @if ($item->status == "In-progress")
+                    @if ($project->status == "In-progress")
                     <h3 class="badge badge-warning">{{ $item->status }}</h3>
                     @endif
 
-                    @if ($item->status == "Completed")
+                    @if ($project->status == "Completed")
                     <h3 class="badge badge-success">{{ $item->status }}</h3>
                     @endif
+                    <p>
+                        <form wire:click.prevent="status">
+                            <div class="form-group">
+                                <label for="project.title" class="col-form-label">
+                                    Change Project Status
+                                </label>
+                                <select wire:model="project.status" class="form-control @error('project.status') is-invalid @enderror">
+                                    <option value="Started">Started</option>
+                                    <option value="In-progress">In-progress</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                                @error('project.status')
+                                <span class="invalid-feedback" role="alert">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </form>
+                    </p>
+                    <h5>Description</h5>
                     <p>
                         {!! $project->description !!}
                     </p>
