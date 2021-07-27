@@ -106,7 +106,7 @@
             <div class="card">
                 <div class="card-header">Manage {{ $project->title }} Tasks
                     <button wire:click="close" type="button" class="btn btn-sm btn-dark" data-bs-dismiss="modal"> Close</button>
-                    <p>
+                    <p class="mt-3">
                         <a wire:click.prevent="addTask" href="#" class="btn btn-sm btn-secondary">Add A Task</a>
                     </p>
                 </div>
@@ -116,7 +116,7 @@
                         <div class="col-md-8">
                             <p>
                                 {{ $t->title }} <br>
-                                <a wire:click.prevent="editTask({{ $t->id }})" href="#" class="btn btn-sm btn-outline-success mb-2">Edit</a>
+                                <a wire:click.prevent="editTask({{ $t->id }})" href="#" class="btn btn-sm btn-outline-success mb-2">Edit</a> <a wire:click.prevent="deleteTask({{ $t->id }})" onclick="confirm('Are you sure {{ $t->title }}?') || event.stopImmediatePropagation()" href="#" class="btn btn-sm btn-outline-danger mb-2">Delete</a>
                             </p>
                         </div>
                         <div class="col-md-4">
@@ -145,7 +145,7 @@
                                 </form>
                         </div>
                         @empty
-                            <p class="text-center">
+                            <p class="text-center ml-2">
                                 No Tasks for this project. <a wire:click.prevent="addTask" href="#" class="btn btn-sm btn-secondary">Add A Task</a>
                             </p>
                         @endforelse

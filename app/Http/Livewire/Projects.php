@@ -195,4 +195,22 @@ class Projects extends Component
         $this->messageText = 'Task '. $task->title . ' status was updated';
         $this->alert = 'success';
     }
+
+    public function deleteTask($taskId)
+    {
+        $this->quickView = false;
+        $this->showForm = false;
+        $this->tasksView = false;
+        $this->taskForm = false;
+        $this->task = Task::find($taskId);
+        if ($this->task) {
+            $this->task->delete();
+
+            $this->messageText = 'Task deleted successfully';
+            $this->alert = 'warning';
+        } else{
+            $this->messageText = 'Could not delete task!';
+            $this->alert = 'danger';
+        }
+    }
 }
