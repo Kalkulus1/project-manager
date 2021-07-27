@@ -38,6 +38,7 @@ class Projects extends Component
         $projects = Project::where('user_id', auth()->id())
                                 ->where('title', 'LIKE', $searchTerm)
                                 ->orWhere('description', 'LIKE', $searchTerm)
+                                ->orWhere('status', 'LIKE', $searchTerm)
                                 ->latest()
                                 ->paginate(10);
 
