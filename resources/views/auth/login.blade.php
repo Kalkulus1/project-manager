@@ -6,7 +6,11 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">{{ __('Login') }}</div>
-
+                <p class="text-center mb-3 mt-3">
+                    Login with: <br>
+                    Email: kalkulus@ktechhub.com <br>
+                    Password: ktechhub
+                </p>
                 <div class="card-body">
                     <form method="POST" action="{{ route('login') }}">
                         @csrf

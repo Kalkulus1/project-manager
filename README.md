@@ -1,5 +1,5 @@
 # project-manager
-A simple project manager with laravel and livewire
+A simple project manager web app built with laravel and livewire on a single page. 
 
 
 ## Install and run the project
