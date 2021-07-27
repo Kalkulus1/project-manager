@@ -1,5 +1,5 @@
 <div class="row justify-content-center">
-    <div class="@if ($quickView) col-md-8 @else col-md-12 @endif">
+    <div class="@if ($quickView || $tasksView) col-md-8 @else col-md-12 @endif">
         <div class="card">
             <div class="card-header">
                 <a wire:click.prevent="create" href="#" class="btn btn-sm btn-primary">Add A Project</a>
@@ -46,7 +46,7 @@
                                         <a wire:click.prevent="view({{ $item->id }})" href="#" class="btn btn-sm btn-outline-primary mb-2">Quick View</a>
                                         <a wire:click.prevent="edit({{ $item->id }})" href="#" class="btn btn-sm btn-outline-success mb-2">Edit</a>
                                         <a wire:click.prevent="delete({{ $item->id }})" onclick="confirm('Are you sure {{ $item->title }}?') || event.stopImmediatePropagation()" href="#" class="btn btn-sm btn-outline-danger mb-2">Delete</a>
-                                        <a href="" class="btn btn-sm btn-outline-dark mb-2">Add Tasks (5)</a>
+                                        <a wire:click.prevent="tasks({{ $item->id }})" href="#" class="btn btn-sm btn-outline-dark mb-2">Tasks ({{ $item->tasks->count() }})</a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -61,19 +61,19 @@
     @if ($quickView)
         <div class="col-md-4">
             <div class="card">
-                <div class="card-header">{{ $project->title }} <button wire:click="close" type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button></div>
+                <div class="card-header">{{ $project->title }} <button wire:click="close" type="button" class="btn btn-sm btn-dark" data-bs-dismiss="modal">Close</button></div>
                 <div class="card-body">
                     Status:
                     @if ($project->status == "Started")
-                    <h3 class="badge badge-dark">{{ $item->status }}</h3>
+                    <h3 class="badge badge-dark">{{ $project->status }}</h3>
                     @endif
 
                     @if ($project->status == "In-progress")
-                    <h3 class="badge badge-warning">{{ $item->status }}</h3>
+                    <h3 class="badge badge-warning">{{ $project->status }}</h3>
                     @endif
 
                     @if ($project->status == "Completed")
-                    <h3 class="badge badge-success">{{ $item->status }}</h3>
+                    <h3 class="badge badge-success">{{ $project->status }}</h3>
                     @endif
                     <p>
                         <form wire:click.prevent="status">
@@ -96,6 +96,60 @@
                     <p>
                         {!! $project->description !!}
                     </p>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if ($tasksView)
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">Manage {{ $project->title }} Tasks
+                    <button wire:click="close" type="button" class="btn btn-sm btn-dark" data-bs-dismiss="modal"> Close</button>
+                    <p>
+                        <a wire:click.prevent="addTask" href="#" class="btn btn-sm btn-secondary">Add A Task</a>
+                    </p>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @forelse ($project->tasks as $t)
+                        <div class="col-md-8">
+                            <p>
+                                {{ $t->title }} <br>
+                                <a wire:click.prevent="editTask({{ $t->id }})" href="#" class="btn btn-sm btn-outline-success mb-2">Edit</a>
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                                @if ($t->status == "Started")
+                                <h3 class="badge badge-dark">{{ $t->status }}</h3>
+                                @endif
+
+                                @if ($t->status == "In-progress")
+                                <h3 class="badge badge-warning">{{ $t->status }}</h3>
+                                @endif
+
+                                @if ($t->status == "Completed")
+                                <h3 class="badge badge-success">{{ $t->status }}</h3>
+                                @endif
+                                <form wire:click.prevent="taskStatus({{ $t->id }})">
+                                    <div class="form-group">
+                                        <select wire:model="task.status" class="form-control @error('task.status') is-invalid @enderror">
+                                            <option value="Started">Started</option>
+                                            <option value="In-progress">In-progress</option>
+                                            <option value="Completed">Completed</option>
+                                        </select>
+                                        @error('task.status')
+                                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </form>
+                        </div>
+                        @empty
+                            <p class="text-center">
+                                No Tasks for this project. <a wire:click.prevent="addTask" href="#" class="btn btn-sm btn-secondary">Add A Task</a>
+                            </p>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
@@ -133,6 +187,35 @@
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">{{ $projectId ? 'Save Changes' : 'Save' }}</button>
+                        <button wire:click="close" type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" class="modal fade" @if ($taskForm) style="display:block" @endif>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form wire:submit.prevent="saveTask">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ $taskId ? 'Edit Task' : 'Add New Task' }}</h5>
+                        <button wire:click="close" type="button" class="btn-close btn-sm btn-dark" data-bs-dismiss="modal" aria-label="Close">X</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="task.title" class="col-form-label">
+                                Title
+                            </label>
+                            <input wire:model="task.title" type="text"
+                                   class="form-control @error('task.title') is-invalid @enderror"/>
+                            @error('task.title')
+                            <span class="invalid-feedback" role="alert">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">{{ $taskId ? 'Save Changes' : 'Save' }}</button>
                         <button wire:click="close" type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                     </div>
                 </form>

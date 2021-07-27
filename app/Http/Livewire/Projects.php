@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Project;
+use App\Models\Task;
 use Livewire\Component;
 
 class Projects extends Component
@@ -10,18 +11,24 @@ class Projects extends Component
     public $project;
     public $projectId;
 
+    public $task;
+    public $taskId;
+
     public $searchTerm;
     public $messageText = '';
     public $alert = '';
 
     public $showForm = false;
-
     public $quickView = false;
+    public $tasksView = false;
+    public $taskForm = false;
 
     protected $rules = [
         'project.title' => 'required|string|max:255|min:3',
         'project.description' => 'required|string|max:1000|min:3',
         'project.status' => 'nullable|min:3',
+        'task.title' => 'nullable|string|max:255|min:3',
+        'task.status' => 'nullable|min:3',
     ];
 
 
@@ -47,11 +54,16 @@ class Projects extends Component
         $this->showForm = true;
         $this->project = null;
         $this->projectId = null;
+
+        $this->tasksView = false;
+        $this->quickView = false;
     }
 
     public function edit($projectId)
     {
+        $this->tasksView = false;
         $this->quickView = false;
+
         $this->showForm = true;
         $this->projectId = $projectId;
         $this->project = Project::find($projectId);
@@ -81,6 +93,8 @@ class Projects extends Component
     public function view($projectId)
     {
         $this->quickView = true;
+        $this->tasksView = false;
+        $this->showForm = false;
         $this->projectId = $projectId;
         $this->project = Project::find($projectId);
     }
@@ -104,12 +118,15 @@ class Projects extends Component
     {
         $this->showForm = false;
         $this->quickView = false;
+        $this->tasksView = false;
+        $this->taskForm = false;
     }
 
     public function delete($projectId)
     {
         $this->quickView = false;
         $this->showForm = false;
+        $this->tasksView = false;
         $this->project = Project::find($projectId);
         if ($this->project) {
             $this->project->delete();
@@ -120,5 +137,62 @@ class Projects extends Component
             $this->messageText = 'Could not delete project!';
             $this->alert = 'danger';
         }
+    }
+
+    public function tasks($projectId)
+    {
+        $this->quickView = false;
+        $this->showForm = false;
+        $this->tasksView = true;
+
+        $this->projectId = $projectId;
+        $this->project = Project::find($projectId);
+    }
+
+    public function addTask()
+    {
+        $this->quickView = false;
+        $this->showForm = false;
+
+        $this->taskForm = true;
+        $this->task = null;
+        $this->taskId = null;
+    }
+
+    public function saveTask()
+    {
+        if (!is_null($this->taskId)) {
+            $this->task->save();
+            $this->messageText = 'Task '. $this->task->title . ' is updated';
+            $this->alert = 'success';
+        } else {
+            $task = new Task;
+            $task->title = $this->task['title'];
+            $task->project_id = $this->projectId;
+            $task->save();
+            $this->messageText = 'New Task Added';
+            $this->alert = 'success';
+        }
+        $this->taskForm = false;
+        $this->task = '';
+    }
+
+    public function editTask($taskId)
+    {
+        $this->quickView = false;
+        $this->showForm = false;
+
+        $this->taskForm = true;
+        $this->taskId = $taskId;
+        $this->task = Task::find($taskId);
+    }
+
+    public function taskStatus($taskId)
+    {
+        $task = Task::find($taskId);
+        $task->status = $this->task['status'];
+        $task->save();
+        $this->messageText = 'Task '. $task->title . ' status was updated';
+        $this->alert = 'success';
     }
 }
