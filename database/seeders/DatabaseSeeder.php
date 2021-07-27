@@ -19,8 +19,8 @@ class DatabaseSeeder extends Seeder
 
         User::firstOrCreate([
             'name' => 'Kalkulus',
-            'email' => 'kalkulus132@gmail.com',
-            'password' => Hash::make('Kalkulus32?!')
+            'email' => 'kalkulus@ktechhub.com',
+            'password' => Hash::make('ktechhub')
         ]);
 
         $this->call(ProjectSeeder::class);
